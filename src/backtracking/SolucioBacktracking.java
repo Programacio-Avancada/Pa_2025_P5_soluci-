@@ -6,11 +6,14 @@ import java.util.List;
 
 public class SolucioBacktracking {
 
-    List<Node> solucio;
-    int danyActual;
-    List<Node> millor;
-    int danyMillor;
+    // definim els següent atributs:
+    List<Node> solucio; // guardem un llistat amb tots els nodes del camí solució
+    int danyActual; // suma del dany total
+    List<Node> millor; // guardem la millor solució
+    int danyMillor; // el mínim dany trobat.
 
+    // IMPORTANT: no cal un atribut Node pel node actual perquè serà el k-èssim de la solució.
+    // el marcatge ho fem directament a la classe Node
 
     public SolucioBacktracking() {
         solucio = new ArrayList<>();
@@ -78,7 +81,7 @@ public class SolucioBacktracking {
                     if( this.esMillor())
                         this.guardarMillorSolucio();
                 } else {
-                    if( solucio.get(k+1).teVeins() ) //aquí també es podria afegir una poda de dany < vida
+                    if( solucio.get(k+1).teVeins() && danyActual < danyMillor) //aquí també es podria afegir una poda de dany < vida
                         this.backMillorSolucio(k + 1);//baixem al següent nivell de l'arbre
                 }
                 // esborrem l'element actual i fem backtracking
@@ -104,15 +107,15 @@ public class SolucioBacktracking {
     }
 
     private void desanotarDeSolucio(int k, int i) {
-        Node actual = solucio.get(k+1);
-        actual.visited = false;
-        danyActual -= actual.cost;
-        solucio.remove(actual);
+        Node ultim = solucio.get(k+1);
+        ultim.visited = false;
+        danyActual -= ultim.cost;
+        solucio.remove(ultim);
     }
 
     private boolean esSolucio(int k, int i) {
-        Node actual = solucio.get(k+1);
-        return actual.sortida;
+        Node ultim = solucio.get(k+1);
+        return ultim.sortida;
     }
 
     private boolean esMillor() {
@@ -122,12 +125,11 @@ public class SolucioBacktracking {
     private void guardarMillorSolucio() {
         danyMillor = danyActual;
         millor = new ArrayList<>(solucio.size());
-        for (Node item : solucio) {
-            millor.add(item);
-        }
+        millor.addAll(solucio);
     }
 
     public String toString() {
+        if( millor.size() == 0) return "No s'ha trobat solució";
         String aux = "Solució amb dany: " + danyMillor + "\n\t";
         for (Node item : millor) {
             aux += item.toString()+" -> ";
